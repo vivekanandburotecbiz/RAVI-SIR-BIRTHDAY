@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Happy Birthday — Ravi Sir 🎉</title>
+  <meta name="description" content="All-in-one birthday celebration page: auto-start confetti, balloons, fireworks, surprise modal, cards, and a dramatic Grand Finale (flash, rings, sparkles, glowing text). No top header bar." />
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --bg-1:#ff0080;--bg-2:#00ff80;--bg-3:#8000ff;--bg-4:#ff8000;--bg-5:#0080ff;--bg-6:#ff4000;
+      --glass-bg: rgba(255,255,255,.14);
+      --glass-brd: rgba(255,255,255,.28);
+      --card-shadow: 0 25px 45px rgba(0,0,0,.12);
+      --gold:#ffd54a; --gold-deep:#f59e0b;
+    }
+
+    /* Background */
+    html,body{ height:100% }
+    body{
+      font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial;
+      background: linear-gradient(45deg,var(--bg-1),var(--bg-2),var(--bg-3),var(--bg-4),var(--bg-1));
+      background-size: 400% 400%;
+      animation: bgShift 12s ease-in-out infinite;
+      overflow-x:hidden;
+    }
+    @keyframes bgShift{ 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+    .playfair{ font-family:'Playfair Display',serif }
+    .dancing{ font-family:'Dancing Script',cursive }
+
+    .glass{ backdrop-filter: blur(18px); background: var(--glass-bg); border:2px solid var(--glass-brd); box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255,255,255,.35) }
+    .floaty{ animation: floaty 6s ease-in-out infinite }
+    @keyframes floaty{ 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-8px)} }
+
+    .rainbow-text{
+      background: linear-gradient(45deg,var(--bg-1),var(--bg-2),var(--bg-3),var(--bg-4),var(--bg-5),var(--bg-6));
+      background-size: 400% 400%;
+      -webkit-background-clip: text; background-clip:text; -webkit-text-fill-color: transparent;
+      animation: rainbow 4s ease-in-out infinite;
+    }
+    @keyframes rainbow{ 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+    /* Confetti (falling) */
+    .confetti{ position: fixed; top:-12px; width:10px; height:14px; opacity:.9; pointer-events:none }
+    .confetti.on{ animation: fall var(--dur,s) linear var(--delay,0s) infinite }
+    @keyframes fall { 0%{ transform: translate3d(var(--x,0),-12px,0) rotate(0) } 100%{ transform: translate3d(var(--xend,0),110vh,0) rotate(720deg) } }
+
+    /* Fireworks (dots that expand/fade) */
+    .fw{ position: fixed; width:8px; height:8px; border-radius:9999px; pointer-events:none }
+    .fw.burst{ animation: burst 1200ms ease-out forwards }
+    @keyframes burst{ from{ transform: scale(.5); opacity:1 } to{ transform: scale(14); opacity:0 } }
+
+    /* Balloons */
+    .balloon{ position: fixed; bottom:-60px; font-size: 2.5rem; filter: drop-shadow(0 6px 12px rgba(0,0,0,.25)); pointer-events:none }
+    .balloon.rise{ animation: rise 4.5s ease-out forwards }
+    @keyframes rise{ from{ transform: translateY(0) rotate(0) } to{ transform: translateY(-110vh) rotate(360deg) } }
+
+    /* Typewriter */
+    .typewriter{ overflow:hidden; white-space:nowrap; border-right: 3px solid rgba(255,255,255,.9); animation: typing 3.6s steps(30,end), caret .8s step-end infinite }
+    @keyframes typing{ from{ width:0 } to{ width:100% } }
+    @keyframes caret{ 50%{ border-color: transparent } }
+
+    /* === GRAND FINALE SPECIAL EFFECTS === */
+    .flash{ position:fixed; inset:0; background:white; opacity:0; pointer-events:none; z-index:80 }
+    .flash.show{ animation: flashPulse 900ms ease-out }
+    @keyframes flashPulse{ 0%{opacity:0} 10%{opacity:.95} 100%{opacity:0} }
+
+    .shake{ animation: camShake 500ms ease-in-out 2 }
+    @keyframes camShake{ 0%,100%{transform: translate(0)} 20%{transform: translate(6px,-4px)} 40%{transform: translate(-5px,5px)} 60%{transform: translate(4px,-6px)} 80%{transform: translate(-4px,3px)} }
+
+    .title-wrap{ position:fixed; inset:0; display:grid; place-items:center; z-index:86; pointer-events:none }
+    .title-text{ font-family:'Playfair Display',serif; font-weight:900; font-size: clamp(2.4rem,8vw,7rem); letter-spacing:.08em; color:transparent; -webkit-text-stroke: 2px var(--gold); text-shadow: 0 0 18px rgba(255,213,74,.6); opacity:0 }
+    .title-wrap.show .title-text{ animation: titlePop 1200ms ease-out forwards }
+    @keyframes titlePop{ 0%{ transform: scale(.7) rotate(-8deg); opacity:0 } 40%{ transform: scale(1.15) rotate(2deg); opacity:1 } 100%{ transform: scale(1) rotate(0) } }
+
+    .rings{ position:fixed; inset:0; z-index:85; pointer-events:none; opacity:0 }
+    .rings.show{ animation: rings 1800ms ease-out forwards }
+    @keyframes rings{ 0%{opacity:0} 15%{opacity:1} 100%{opacity:0} }
+    .ring{ position:absolute; left:50%; top:50%; width:10px; height:10px; border:3px solid var(--gold); border-radius:9999px; transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 30px var(--gold) }
+    .ring.r1{ animation: ringPop 1800ms ease-out forwards }
+    .ring.r2{ animation: ringPop 2000ms ease-out 120ms forwards }
+    .ring.r3{ animation: ringPop 2200ms ease-out 240ms forwards }
+    @keyframes ringPop{ from{ transform: translate(-50%,-50%) scale(1); opacity:1 } to{ transform: translate(-50%,-50%) scale(40); opacity:0 } }
+
+    /* Blast particles */
+    .blast{ position:fixed; left:50%; top:50%; width:8px; height:8px; border-radius:2px; pointer-events:none; z-index:87 }
+    .blast.go{ animation: blastFly var(--bdur,1800ms) cubic-bezier(.2,.7,0,1) forwards }
+    @keyframes blastFly{ from{ transform: translate(0,0) rotate(0deg); opacity:1 } to{ transform: translate(var(--tx),var(--ty)) rotate(720deg); opacity:0 } }
+
+    /* Sparkles */
+    .spark{ position:fixed; width:6px; height:6px; border-radius:9999px; pointer-events:none; z-index:88; mix-blend-mode: screen; opacity:0 }
+    .spark.show{ animation: sparkle 900ms ease-out forwards }
+    @keyframes sparkle{ 0%{opacity:0; transform: scale(.5)} 30%{opacity:1; transform: scale(1)} 100%{opacity:0; transform: scale(0)} }
+
+    @media (prefers-reduced-motion: reduce){
+      body:not(.force-motion) *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important }
+      body:not(.force-motion) .confetti.on,
+      body:not(.force-motion) .fw.burst,
+      body:not(.force-motion) .balloon.rise{ animation: none !important }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen force-motion">
+  <!-- FX containers -->
+  <div id="confetti" aria-hidden="true"></div>
+  <div id="fw" aria-hidden="true"></div>
+
+  <!-- Finale overlays (created here to avoid layout shifts) -->
+  <div id="flash" class="flash"></div>
+  <div id="rings" class="rings">
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
+  </div>
+  <div id="titleWrap" class="title-wrap">
+    <div id="titleText" class="title-text">GRAND FINALE ✨</div>
+  </div>
+
+  <header class="relative z-10 text-center pt-20 pb-10 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-8xl mb-6 select-none" aria-hidden="true"><span class="inline-block animate-pulse">👑</span></div>
+      <h1 class="rainbow-text playfair text-6xl md:text-8xl font-black mb-4 leading-tight">HAPPY BIRTHDAY</h1>
+      <div class="dancing text-white/95 text-5xl md:text-7xl font-bold mb-6">
+        <span id="nameTW" class="typewriter">Ravi Sir</span>
+      </div>
+      <p class="max-w-3xl mx-auto bg-white/95 text-black font-semibold rounded-2xl px-6 py-4 shadow-2xl">🎊 Celebrating an amazing human on their special day! 🎊</p>
+    </div>
+  </header>
+
+  <main id="main" class="relative z-10 max-w-7xl mx-auto px-6 pb-24">
+    <section class="mb-14">
+      <article class="glass rounded-3xl p-10 floaty">
+        <div class="text-center">
+          <div class="text-6xl md:text-7xl mb-6 select-none" aria-hidden="true">🎂 🎈 🎁</div>
+          <h2 class="playfair text-3xl md:text-4xl font-bold text-black bg-white rounded-2xl inline-block px-6 py-3 shadow-xl">Time to Celebrate! 🥳</h2>
+          <div class="grid gap-5 md:grid-cols-3 mt-8 text-left">
+            <p class="bg-white rounded-2xl px-6 py-5 shadow-xl text-black font-semibold">🌟 Today is all about <span class="font-extrabold" id="nameInline">Ravi Sir</span> — wisdom, kindness, and leadership that lifts everyone.</p>
+            <p class="bg-white rounded-2xl px-6 py-5 shadow-xl text-black font-semibold">🚀 May this new year bring playful adventures, deep joy, and audacious wins.</p>
+            <p class="bg-white rounded-2xl px-6 py-5 shadow-xl text-black font-semibold">💫 Here’s to another orbit of pure awesomeness!</p>
+          </div>
+          <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <button id="btnParty2" class="px-6 py-3 rounded-full text-white font-bold text-lg shadow-2xl bg-gradient-to-r from-fuchsia-600 to-violet-600">🎉 Party Time</button>
+            <button id="btnSurprise2" class="px-6 py-3 rounded-full text-white font-bold text-lg shadow-2xl bg-gradient-to-r from-amber-500 to-rose-500">🎁 Surprise</button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mb-14">
+      <h3 class="playfair text-4xl md:text-5xl font-bold text-center mb-8 rainbow-text">Why You’re AMAZING ⭐</h3>
+      <div class="grid gap-6 md:grid-cols-3">
+        <div class="glass rounded-2xl p-7 text-center">
+          <div class="text-5xl mb-4" aria-hidden="true">🧠</div>
+          <h4 class="playfair text-2xl font-bold text-black bg-white rounded-xl inline-block px-4 py-2 shadow">Brilliant Mind</h4>
+          <p class="mt-3 text-black font-semibold bg-white rounded-xl px-4 py-3 shadow">You solve gnarly problems like it’s a Sunday crossword.</p>
+        </div>
+        <div class="glass rounded-2xl p-7 text-center">
+          <div class="text-5xl mb-4" aria-hidden="true">❤️</div>
+          <h4 class="playfair text-2xl font-bold text-black bg-white rounded-xl inline-block px-4 py-2 shadow">Kind Heart</h4>
+          <p class="mt-3 text-black font-semibold bg-white rounded-xl px-4 py-3 shadow">People glow a little brighter around you. Empathy: 11/10.</p>
+        </div>
+        <div class="glass rounded-2xl p-7 text-center">
+          <div class="text-5xl mb-4" aria-hidden="true">🌟</div>
+          <h4 class="playfair text-2xl font-bold text-black bg-white rounded-xl inline-block px-4 py-2 shadow">Natural Leader</h4>
+          <p class="mt-3 text-black font-semibold bg-white rounded-xl px-4 py-3 shadow">You inspire the room to aim higher and get there together.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <article class="glass rounded-3xl p-10 text-center">
+        <div class="text-6xl md:text-7xl mb-6 select-none" aria-hidden="true">🎊 🥳 🎊</div>
+        <h3 class="playfair text-3xl md:text-4xl font-bold text-black bg-white rounded-2xl inline-block px-6 py-3 shadow">Birthday Wishes 💝</h3>
+        <div class="grid gap-4 max-w-3xl mx-auto mt-6">
+          <p class="bg-white rounded-2xl px-6 py-4 shadow text-black font-semibold">🎈 May your day overflow with laughter.</p>
+          <p class="bg-white rounded-2xl px-6 py-4 shadow text-black font-semibold">🌟 May your boldest ideas find the wind at their back.</p>
+          <p class="bg-white rounded-2xl px-6 py-4 shadow text-black font-semibold">🎉 May you keep inspiring all of us to be better humans.</p>
+          <p class="bg-white rounded-2xl px-6 py-4 shadow text-black font-semibold">💫 Happy Birthday, <span class="font-extrabold" id="nameInline2">Ravi Sir</span> — stay legendary!</p>
+        </div>
+        <button id="btnFinale2" class="mt-8 px-8 py-4 rounded-full text-white font-bold text-xl shadow-2xl bg-gradient-to-r from-cyan-600 to-emerald-600">🎆 Grand Finale</button>
+      </article>
+    </section>
+  </main>
+
+  <!-- Surprise Modal -->
+  <div id="modal" class="hidden fixed inset-0 z-[70] bg-black/70 p-6 grid place-items-center">
+    <div role="dialog" aria-modal="true" aria-labelledby="surpriseTitle" class="glass rounded-3xl p-10 max-w-3xl w-full text-center">
+      <div class="text-7xl mb-6" aria-hidden="true">🎁</div>
+      <h3 id="surpriseTitle" class="playfair text-4xl font-bold text-black bg-white rounded-2xl inline-block px-6 py-3 shadow">Surprise Message 💌</h3>
+      <div class="mt-6 grid gap-4 text-2xl">
+        <p class="bg-white rounded-2xl px-6 py-4 shadow text-black font-semibold">🌟 Dear <span id="nameInline3" class="font-extrabold">Ravi Sir</span>, you are absolutely incredible.</p>
+        <p class="bg-white rounded-2xl px-6 py-4 shadow text-black font-semibold">🎊 Your positivity lights up every room you enter.</p>
+        <p class="bg-white rounded-2xl px-6 py-4 shadow text-black font-semibold">🚀 Thanks for being a constant source of inspiration.</p>
+        <p class="bg-white rounded-2xl px-6 py-4 shadow text-black font-semibold">💖 Wishing you a year as wonderful as you are.</p>
+      </div>
+      <button id="btnClose" class="mt-8 px-6 py-3 rounded-full text-white font-bold text-lg shadow-2xl bg-indigo-600 hover:bg-indigo-500">🥳 Awesome</button>
+    </div>
+  </div>
+
+  <script>
+    // Helpers
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => [...ctx.querySelectorAll(sel)];
+    const NAME = new URLSearchParams(location.search).get('name')?.trim() || 'Ravi Sir';
+    const TITLE = new URLSearchParams(location.search).get('title')?.trim() || 'HAPPY BIRTHDAY';
+
+    // Paint dynamic text
+    $('#nameTW').textContent = NAME;
+    $('#nameInline').textContent = NAME;
+    $('#nameInline2').textContent = NAME;
+    $('#nameInline3').textContent = NAME;
+    $$('h1')[0].textContent = TITLE;
+
+    // Motion always on (no top controls)
+    let motionEnabled = true;
+
+    // Confetti
+    const confettiRoot = $('#confetti');
+    const confColors = ['#ff0080','#00ff80','#8000ff','#ff8000','#0080ff','#ff4000'];
+    const CONFETTI_COUNT = 140;
+    let confettiBuilt = false;
+
+    function buildConfetti(){
+      if(confettiBuilt) return; confettiBuilt = true;
+      for(let i=0;i<CONFETTI_COUNT;i++){
+        const d = document.createElement('div');
+        d.className = 'confetti';
+        d.style.background = confColors[i%confColors.length];
+        d.style.left = Math.random()*100 + 'vw';
+        d.style.borderRadius = Math.random()>.5? '2px':'9999px';
+        d.style.setProperty('--x', (Math.random()*40-20)+'px');
+        d.style.setProperty('--xend', (Math.random()*120-60)+'px');
+        d.style.setProperty('--dur', (2+Math.random()*3)+'s');
+        d.style.setProperty('--delay', (Math.random()*2)+'s');
+        confettiRoot.appendChild(d);
+      }
+    }
+    function startConfetti(){ if(!motionEnabled) return; buildConfetti(); $$('.confetti').forEach(n=> n.classList.add('on')); }
+
+    // Fireworks (random bursts)
+    const fwRoot = $('#fw');
+    function fireworkBurst(){
+      if(!motionEnabled) return;
+      const x = Math.random()*100, y = Math.random()*70 + 10;
+      const c = confColors[Math.floor(Math.random()*confColors.length)];
+      const dot = document.createElement('div');
+      dot.className = 'fw burst';
+      Object.assign(dot.style, { left: x+'vw', top: y+'vh', background: c, boxShadow: `0 0 24px ${c}` });
+      fwRoot.appendChild(dot);
+      setTimeout(()=> dot.remove(), 1200);
+    }
+
+    // Balloons
+    const balloons = ['🎈','🎊','🎉','✨','🌟','💫'];
+    function releaseBalloons(count=14){
+      if(!motionEnabled) return;
+      for(let i=0;i<count;i++){
+        setTimeout(()=>{
+          const b = document.createElement('div');
+          b.className = 'balloon rise';
+          b.textContent = balloons[Math.floor(Math.random()*balloons.length)];
+          b.style.left = Math.random()*100 + 'vw';
+          document.body.appendChild(b);
+          setTimeout(()=> b.remove(), 4800);
+        }, i*160);
+      }
+    }
+
+    // Toast (quick center overlay)
+    function toast(icon, title, msg, ttl=1600){
+      const t = document.createElement('div');
+      t.className = 'fixed z-[90] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black rounded-2xl shadow-2xl px-6 py-5 text-center';
+      t.innerHTML = '<div class="text-5xl">'+icon+'</div><div class="playfair text-2xl font-bold mt-1">'+title+'</div><div class="font-semibold">'+msg+'</div>';
+      document.body.appendChild(t);
+      setTimeout(()=> t.remove(), ttl);
+    }
+
+    // Party (regular sequence)
+    function party(){
+      startConfetti();
+      for(let i=0;i<18;i++) setTimeout(fireworkBurst, i*120);
+      releaseBalloons(14);
+      toast('🎉','Party Time!','Let the celebration begin!');
+    }
+
+    // === SPECIAL GRAND FINALE (unique) ===
+    function grandFinale(){
+      // Flash + shake
+      const flash = $('#flash');
+      flash.classList.remove('show'); void flash.offsetWidth; // restart animation
+      flash.classList.add('show');
+      document.body.classList.add('shake');
+      setTimeout(()=> document.body.classList.remove('shake'), 1000);
+
+      // Golden rings
+      const rings = $('#rings');
+      rings.classList.remove('show'); void rings.offsetWidth;
+      rings.classList.add('show');
+
+      // Big title (personalized)
+      const titleWrap = $('#titleWrap');
+      const titleText = $('#titleText');
+      titleText.textContent = 'HAPPY BIRTHDAY, ' + NAME + ' 🎆';
+      titleWrap.classList.remove('show'); void titleWrap.offsetWidth;
+      titleWrap.classList.add('show');
+
+      // Sparkles + blast particles
+      sparkleBurst(120);
+      centerBlast(160);
+
+      // A few dense fireworks waves
+      setTimeout(()=>{ for(let i=0;i<26;i++) setTimeout(fireworkBurst, i*90); }, 200);
+      setTimeout(()=>{ for(let i=0;i<26;i++) setTimeout(fireworkBurst, i*75); }, 900);
+      setTimeout(()=> releaseBalloons(24), 700);
+    }
+
+    // Center blast particles: shoot small squares outwards
+    function centerBlast(n=140){
+      const centerX = window.innerWidth/2;
+      const centerY = window.innerHeight/2;
+      for(let i=0;i<n;i++){
+        const p = document.createElement('div');
+        p.className = 'blast go';
+        const angle = Math.random()*Math.PI*2;
+        const distance = 120 + Math.random()*380;
+        const tx = Math.cos(angle)*distance;
+        const ty = Math.sin(angle)*distance;
+        const color = confColors[Math.floor(Math.random()*confColors.length)];
+        p.style.background = color;
+        p.style.left = centerX+'px';
+        p.style.top = centerY+'px';
+        p.style.setProperty('--tx', tx+'px');
+        p.style.setProperty('--ty', ty+'px');
+        p.style.setProperty('--bdur', (1200+Math.random()*900)+'ms');
+        document.body.appendChild(p);
+        setTimeout(()=> p.remove(), 2200);
+      }
+    }
+
+    // Sparkles around the screen
+    function sparkleBurst(n=80){
+      for(let i=0;i<n;i++){
+        const s = document.createElement('div');
+        s.className = 'spark show';
+        s.style.left = (Math.random()*100)+'vw';
+        s.style.top = (Math.random()*100)+'vh';
+        s.style.background = 'radial-gradient(circle, rgba(255,255,255,0.95), rgba(255,255,255,0))';
+        document.body.appendChild(s);
+        setTimeout(()=> s.remove(), 900);
+      }
+    }
+
+    // Modal controls
+    const modal = $('#modal');
+    const openModal = ()=>{ modal.classList.remove('hidden'); document.body.style.overflow='hidden' };
+    const closeModal = ()=>{ modal.classList.add('hidden'); document.body.style.overflow='' };
+
+    // Buttons
+    $('#btnParty2').addEventListener('click', party);
+    $('#btnSurprise2').addEventListener('click', openModal);
+    $('#btnClose').addEventListener('click', closeModal);
+    $('#btnFinale2').addEventListener('click', grandFinale);
+
+    // Auto-start baseline sequence
+    document.addEventListener('DOMContentLoaded', ()=>{
+      buildConfetti();
+      startConfetti();               // confetti immediately
+      setTimeout(()=> party(), 900); // small burst
+      // Finale is manual (button) so it's special
+    });
+
+    // Escape closes modal
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal() });
+  </script>
+</body>
+</html>
